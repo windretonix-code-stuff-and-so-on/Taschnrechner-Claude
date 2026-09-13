@@ -190,6 +190,11 @@ export function createLayout(rootEl) {
     orbEl.style.height = `${master.orb.r * 2}px`;
     rootEl.appendChild(orbEl);
 
+    const displayEl = document.createElement('div');
+    displayEl.className = 'display';
+    displayEl.style.fontSize = `${master.orb.r * 0.22}px`;
+    orbEl.appendChild(displayEl);
+
     for (const d of master.digits) {
       sphere(`digit-${d.digit}`, d, 'sphere--digit', String(d.digit));
     }
@@ -233,5 +238,9 @@ export function createLayout(rootEl) {
   window.addEventListener('resize', fitToViewport);
   fitToViewport();
 
-  return { fitToViewport, getMaster: () => currentMaster };
+  return {
+    fitToViewport,
+    getMaster: () => currentMaster,
+    getDisplayElement: () => rootEl.querySelector('.display'),
+  };
 }

@@ -98,6 +98,35 @@ body {
   filter: brightness(1.5);
 }
 
+/* Main expression/result display: near-white magical text with a soft
+   blue/violet glow, no box/border/ordinary shadow, one exact horizontal
+   line through the orb's geometric center (brief). */
+.display {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  color: #f4f7ff;
+  text-shadow:
+    0 0 0.1em rgba(200, 210, 255, 0.95),
+    0 0 0.35em rgba(140, 150, 255, 0.7),
+    0 0 0.8em rgba(120, 90, 255, 0.35);
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.display .char {
+  display: inline-block;
+}
+
+.display .char--padded {
+  margin: 0 0.22em;
+}
+
 .sphere-label {
   font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif;
   font-weight: 500;
