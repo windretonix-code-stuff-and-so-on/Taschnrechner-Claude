@@ -16,9 +16,40 @@ body {
 }
 
 /* The artifact root is scaled uniformly from a 1000x1000 (or portrait) master
-   coordinate system by js/layout.js, which sets --orb-scale and positions
-   this element. See PLAN.md / ASSETS.md for the coordinate contract. */
+   coordinate system by js/layout.js (fitToViewport sets a CSS transform).
+   See PLAN.md / ASSETS.md for the coordinate contract. Placeholder flat
+   styling here; feature/visual-design replaces it with the crystal/gold
+   asset layers. */
 .artifact {
   position: relative;
   transform-origin: center center;
+  /* Intentionally NOT flex-shrunk: the element is authored at its full
+     master-coordinate size and scaled down as a whole via fitToViewport's
+     CSS transform, so flexbox must not additionally shrink its layout box
+     (that would compound with the transform scale). */
+  flex-shrink: 0;
+}
+
+.main-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #2a3a6b, #0a0e1e 70%);
+  box-shadow: 0 0 60px rgba(90, 110, 255, 0.25);
+}
+
+.sphere {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #4a5aa0, #12162c 75%);
+  box-shadow: 0 0 12px rgba(110, 130, 255, 0.35);
+}
+
+.sphere--control.sphere--equals {
+  background: radial-gradient(circle at 35% 30%, #6a5aff, #16123c 75%);
+}
+
+.candle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #caa15a 0%, #3a2a12 80%);
 }
