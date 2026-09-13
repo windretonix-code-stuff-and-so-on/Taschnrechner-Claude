@@ -18,4 +18,13 @@ export const tests = [
     name: 'does not display a negative zero',
     fn: () => assertEqual(formatNumber(-0), '0'),
   },
+  {
+    name: 'does not throw for magnitudes >= 1e21 (Number.toFixed()s hard limit)',
+    fn: () => {
+      const result = formatNumber(1e21 * 3);
+      if (typeof result !== 'string' || result.length === 0) {
+        throw new Error('expected a non-empty formatted string, got ' + JSON.stringify(result));
+      }
+    },
+  },
 ];

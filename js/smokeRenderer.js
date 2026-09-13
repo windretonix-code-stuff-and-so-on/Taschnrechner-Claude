@@ -95,6 +95,21 @@ export function createSmokeRenderer({ rearCanvas, frontCanvas }) {
   function step(dt) {
     const { cx, cy, radius } = center();
 
+    // Burst ("attract") particles ignore the density-based pruning below by
+    // design (they're converging on the center, not idle mist) — but they
+    // must still expire on their own, or repeated bursts (e.g. multiple
+    // division-by-zero errors in one session) would accumulate particles
+    // forever. Age them out, plus a hard safety cap either way, per the
+    // brief's "avoid uncontrolled particle counts" requirement.
+    const BURST_MAX_AGE_MS = 2200;
+    const HARD_CAP = MAX_DENSITY_PARTICLES + 20;
+    for (let i = particles.length - 1; i >= 0; i -= 1) {
+      if (particles[i].attract && particles[i].age > BURST_MAX_AGE_MS) {
+        particles.splice(i, 1);
+      }
+    }
+    while (particles.length > HARD_CAP) particles.pop();
+
     // ease particle count toward target density
     const desired = Math.round(condensing ? targetDensity * 1.6 : targetDensity);
     while (particles.length < desired) particles.push(new Particle(Math.random() < 0.5 ? 'rear' : 'front', cx, cy, radius));

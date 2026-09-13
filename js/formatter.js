@@ -6,9 +6,19 @@
 
 const EPSILON_DECIMALS = 12;
 
+// Number.prototype.toFixed() throws a RangeError for |value| >= 1e21 — a
+// reachable result (e.g. large multiplications) that must never crash the
+// calculator. Fall back to the engine's own notation for that rare range
+// instead of throwing.
+const TOFIXED_SAFE_LIMIT = 1e21;
+
 export function formatNumber(value) {
   if (!Number.isFinite(value)) {
     throw new Error('formatNumber() erwartet einen endlichen Wert (Division durch Null muss vorher abgefangen werden)');
+  }
+
+  if (Math.abs(value) >= TOFIXED_SAFE_LIMIT) {
+    return value.toString().replace('.', ',');
   }
 
   let rounded = Number(value.toFixed(EPSILON_DECIMALS));

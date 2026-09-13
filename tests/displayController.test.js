@@ -1,5 +1,5 @@
 import { assertEqual } from './assert.js';
-import { visibleWindow, textForState } from '../js/displayController.js';
+import { visibleWindow, textForState, isPaddedChar } from '../js/displayController.js';
 import { createState } from '../js/state.js';
 
 export const tests = [
@@ -22,5 +22,19 @@ export const tests = [
   {
     name: 'error state shows no expression text (the wizard sequence owns the orb)',
     fn: () => assertEqual(textForState({ ...createState(), mode: 'error', errorType: 'division-by-zero' }), ''),
+  },
+  {
+    name: 'both minus variants get optical padding (ASCII hyphen is what state.js actually stores)',
+    fn: () => {
+      assertEqual(isPaddedChar('-'), true);
+      assertEqual(isPaddedChar('−'), true);
+    },
+  },
+  {
+    name: 'digits and the decimal comma are not padded',
+    fn: () => {
+      assertEqual(isPaddedChar('5'), false);
+      assertEqual(isPaddedChar(','), false);
+    },
   },
 ];
