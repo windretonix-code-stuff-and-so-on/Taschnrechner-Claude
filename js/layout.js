@@ -6,6 +6,8 @@
 //
 // Digit symmetry (brief): 0/9 lowest & level, 1<->8, 2<->7, 3<->6, 4<->5,
 // with the empty apex gap between 4 and 5 (no digit at top-center).
+import { renderBaseLayer, renderOrnamentLayer } from './frameRenderer.js';
+
 const DIGIT_PAIRS = [
   { angleDeg: 14, left: 4, right: 5 },
   { angleDeg: 32, left: 3, right: 6 },
@@ -126,6 +128,26 @@ export function pickMaster(viewportWidth, viewportHeight) {
 
 const VIEWPORT_FILL_RATIO = 0.87; // 85-90% of usable viewport height (brief)
 
+const CONTROL_LABELS = {
+  plus: '+',
+  minus: '−',
+  clear: 'C',
+  equals: '=',
+  backspace: '←',
+  multiply: '×',
+  divide: '÷',
+  lparen: '(',
+  rparen: ')',
+  negate: '+/−',
+  decimal: ',',
+};
+
+function svgLayer(className) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', className);
+  return svg;
+}
+
 export function createLayout(rootEl) {
   let currentMaster = null;
 
@@ -134,7 +156,7 @@ export function createLayout(rootEl) {
     rootEl.style.width = `${master.width}px`;
     rootEl.style.height = `${master.height}px`;
 
-    const sphere = (key, { x, y, r }, extraClass = '') => {
+    const sphere = (key, { x, y, r }, extraClass = '', label = '') => {
       const el = document.createElement('div');
       el.className = `sphere ${extraClass}`.trim();
       el.dataset.key = key;
@@ -142,9 +164,23 @@ export function createLayout(rootEl) {
       el.style.top = `${y - r}px`;
       el.style.width = `${r * 2}px`;
       el.style.height = `${r * 2}px`;
+      el.style.fontSize = `${r * 0.9}px`;
+      if (label) {
+        const labelEl = document.createElement('span');
+        labelEl.className = 'sphere-label';
+        labelEl.textContent = label;
+        el.appendChild(labelEl);
+      }
       rootEl.appendChild(el);
       return el;
     };
+
+    // Layer order (back to front): base plate (metal) -> main orb (crystal)
+    // -> small spheres (crystal) -> ornaments (metal struts/prongs that
+    // visually grip each sphere) -> candle.
+    const baseLayer = svgLayer('frame-layer frame-layer--base');
+    rootEl.appendChild(baseLayer);
+    renderBaseLayer(baseLayer, master);
 
     const orbEl = document.createElement('div');
     orbEl.className = 'main-orb';
@@ -155,14 +191,18 @@ export function createLayout(rootEl) {
     rootEl.appendChild(orbEl);
 
     for (const d of master.digits) {
-      sphere(`digit-${d.digit}`, d, 'sphere--digit');
+      sphere(`digit-${d.digit}`, d, 'sphere--digit', String(d.digit));
     }
     for (const c of master.controlsPrimary) {
-      sphere(c.id, c, `sphere--control sphere--${c.id}`);
+      sphere(c.id, c, `sphere--control sphere--${c.id}`, CONTROL_LABELS[c.id]);
     }
     for (const c of master.controlsSecondary) {
-      sphere(c.id, c, `sphere--control sphere--${c.id}`);
+      sphere(c.id, c, `sphere--control sphere--${c.id}`, CONTROL_LABELS[c.id]);
     }
+
+    const ornamentLayer = svgLayer('frame-layer frame-layer--ornament');
+    rootEl.appendChild(ornamentLayer);
+    renderOrnamentLayer(ornamentLayer, master);
 
     const candleEl = document.createElement('div');
     candleEl.className = 'candle';
@@ -172,6 +212,10 @@ export function createLayout(rootEl) {
     candleEl.style.width = `${master.candle.r * 2}px`;
     candleEl.style.height = `${master.candle.r * 2}px`;
     rootEl.appendChild(candleEl);
+
+    const flameEl = document.createElement('div');
+    flameEl.className = 'candle-flame';
+    candleEl.appendChild(flameEl);
   }
 
   function fitToViewport() {
