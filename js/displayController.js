@@ -1,6 +1,33 @@
-// 9-character visible window, displacement/restoration bookkeeping.
-// Filled in on feature/layout-structure / feature/visual-design.
+// Renders the 9-character visible window into the display element inside
+// the main orb. Operators/parentheses get purely optical CSS padding that
+// does NOT count toward the 9-character limit (brief). Smoke-based
+// dissolve/rematerialize motion for displaced characters is layered on top
+// in feature/animation-particles — this module owns the correct windowed
+// text/DOM, independent of any animation.
 
-export function createDisplayController(_deps) {
-  throw new Error('createDisplayController() not implemented yet');
+const VISIBLE_LIMIT = 9;
+const PADDED_CHARS = new Set(['+', '−', '×', '÷', '(', ')']);
+
+export function visibleWindow(text, limit = VISIBLE_LIMIT) {
+  return text.length <= limit ? text : text.slice(text.length - limit);
+}
+
+export function renderDisplay(displayEl, text) {
+  displayEl.innerHTML = '';
+  for (const ch of visibleWindow(text)) {
+    const span = document.createElement('span');
+    span.className = `char${PADDED_CHARS.has(ch) ? ' char--padded' : ''}`;
+    span.textContent = ch;
+    displayEl.appendChild(span);
+  }
+}
+
+// What should currently be shown, given calculation state (state.js).
+// Error mode intentionally renders empty text here — the wizard sequence
+// (feature/animation-particles) owns the orb's content while an error is
+// being shown.
+export function textForState(state) {
+  if (state.mode === 'result') return state.result ?? '';
+  if (state.mode === 'error') return '';
+  return state.expression;
 }
