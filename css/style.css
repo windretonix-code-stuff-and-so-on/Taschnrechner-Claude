@@ -250,8 +250,30 @@ body {
   transform-origin: 50% 100%;
 }
 
+.candle {
+  cursor: pointer;
+}
+
 .candle.is-muted .candle-flame {
   opacity: 0;
+}
+
+.candle.is-extinguishing::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -20%;
+  width: 14%;
+  height: 45%;
+  background: linear-gradient(to top, rgba(210, 210, 220, 0.55), rgba(210, 210, 220, 0));
+  transform: translateX(-50%);
+  animation: candle-wisp 1s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes candle-wisp {
+  0% { opacity: 0.75; transform: translate(-50%, 0) scaleY(0.4); }
+  100% { opacity: 0; transform: translate(-50%, -140%) scaleY(1.4); }
 }
 
 @keyframes flame-flicker {

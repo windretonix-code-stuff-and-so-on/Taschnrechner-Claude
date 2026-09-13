@@ -79,7 +79,7 @@ export function createAnimationController({ getDisplayEl, getWizardEl, getOrbEl,
     }, RESULT_DURATION);
   }
 
-  function playError(onDone) {
+  function playError(onDone, onLaugh) {
     cancel();
     const myRun = runId;
     running = 'error';
@@ -107,6 +107,7 @@ export function createAnimationController({ getDisplayEl, getWizardEl, getOrbEl,
         if (runId !== myRun) return;
         wizardEl?.classList.add('is-laughing');
         smoke.burst(4, { dark: true });
+        onLaugh?.();
       }, start);
       schedule(() => {
         if (runId !== myRun) return;
