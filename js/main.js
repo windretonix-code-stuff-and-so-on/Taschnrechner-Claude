@@ -10,6 +10,7 @@ import { createState, clear } from './state.js';
 import { renderDisplay, textForState } from './displayController.js';
 import { createSmokeRenderer } from './smokeRenderer.js';
 import { createAnimationController } from './animationController.js';
+import { createAudioController } from './audioController.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const app = document.getElementById('app');
@@ -31,6 +32,26 @@ document.addEventListener('DOMContentLoaded', () => {
     getOrbEl: () => artifact.querySelector('.main-orb'),
     smoke,
   });
+
+  const audio = createAudioController();
+
+  function updateCandleVisual() {
+    const candleEl = artifact.querySelector('.candle');
+    candleEl?.classList.toggle('is-muted', !audio.isEnabled());
+  }
+
+  artifact.addEventListener('click', (event) => {
+    if (!event.target.closest('.candle')) return;
+    const wasEnabled = audio.isEnabled();
+    audio.toggle();
+    updateCandleVisual();
+    if (wasEnabled) {
+      const candleEl = artifact.querySelector('.candle');
+      candleEl?.classList.add('is-extinguishing');
+      window.setTimeout(() => candleEl?.classList.remove('is-extinguishing'), 1000);
+    }
+  });
+  updateCandleVisual();
 
   let state = createState();
 
@@ -58,7 +79,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (state.mode === 'error' && prevMode !== 'error') {
-      anim.playError(() => setState(clear(state)));
+      anim.playError(
+        () => setState(clear(state)),
+        () => audio.playImpulse()
+      );
     }
   }
 
@@ -72,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('resize', () => {
     smoke.rebind(layout.getRearCanvas(), layout.getFrontCanvas());
+    updateCandleVisual();
     if (state.mode === 'idle') applyIdle();
   });
 });
